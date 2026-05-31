@@ -145,6 +145,7 @@ public class ModOptionsGui extends LightweightGuiDescription {
         behavior.add(stackToNearbyContainersIntervalSeconds, 230, 20);
 
         behavior.add(createCheckbox("supportForContainerEntities", options.behavior.supportForContainerEntities));
+        behavior.add(createCheckbox("doNotSortRenamedItemsToNearbyContainers", options.behavior.doNotSortRenamedItemsToNearbyContainers));
 
         behavior.add(createCheckbox("doNotQuickStackItemsFromTheHotbar", options.behavior.doNotQuickStackItemsFromTheHotbar));
 

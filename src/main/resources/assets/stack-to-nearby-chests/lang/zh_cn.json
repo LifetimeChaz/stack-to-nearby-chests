@@ -73,4 +73,5 @@
   "stack-to-nearby-chests.options.searchInterval.tooltip": "对上一个容器的操作结束到开启下一个容器之间的时间（单位：毫秒）"
   ,"stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds": "快速堆叠到附近容器的间隔（秒）"
   ,"stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds.tooltip": "每隔 X 秒自动执行一次“快速堆叠到附近的容器”（0 = 禁用）"
+  ,"stack-to-nearby-chests.options.doNotSortRenamedItemsToNearbyContainers": "不要将已重命名物品快速堆叠到附近容器"
 }

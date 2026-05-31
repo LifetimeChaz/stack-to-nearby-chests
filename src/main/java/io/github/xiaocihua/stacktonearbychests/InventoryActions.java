@@ -102,7 +102,7 @@ public class InventoryActions {
     }
 
     public static void quickStackToNearbyContainers(AbstractContainerMenu screenHandler) {
-        quickStack(screenHandler, true);
+        quickStack(screenHandler, ModOptions.get().behavior.doNotSortRenamedItemsToNearbyContainers.booleanValue());
     }
 
     private static void quickStack(AbstractContainerMenu screenHandler, boolean skipRenamedItems) {
@@ -121,7 +121,7 @@ public class InventoryActions {
     }
 
     public static void quickStackToNearbyContainers(AbstractContainerMenu screenHandler, Item item) {
-        quickStack(screenHandler, item, true);
+        quickStack(screenHandler, item, ModOptions.get().behavior.doNotSortRenamedItemsToNearbyContainers.booleanValue());
     }
 
     private static void quickStack(AbstractContainerMenu screenHandler, Item item, boolean skipRenamedItems) {
