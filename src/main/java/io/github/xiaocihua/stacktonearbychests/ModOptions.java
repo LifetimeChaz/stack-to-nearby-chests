@@ -104,8 +104,10 @@ public class ModOptions {
 
     public static class Behavior {
         public IntOption searchInterval = new IntOption(0);
+        public IntOption stackToNearbyContainersIntervalSeconds = new IntOption(0);
 
         public MutableBoolean supportForContainerEntities = new MutableBoolean(true);
+        public MutableBoolean doNotSortRenamedItemsToNearbyContainers = new MutableBoolean(true);
 
         public MutableBoolean doNotQuickStackItemsFromTheHotbar = new MutableBoolean(false);
 

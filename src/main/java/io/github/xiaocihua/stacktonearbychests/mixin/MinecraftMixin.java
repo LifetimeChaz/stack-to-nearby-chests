@@ -2,6 +2,7 @@ package io.github.xiaocihua.stacktonearbychests.mixin;
 
 import io.github.xiaocihua.stacktonearbychests.KeySequence;
 import io.github.xiaocihua.stacktonearbychests.LockedSlots;
+import io.github.xiaocihua.stacktonearbychests.InventoryActions;
 import io.github.xiaocihua.stacktonearbychests.event.DisconnectCallback;
 import io.github.xiaocihua.stacktonearbychests.event.SetScreenCallback;
 import net.minecraft.client.Minecraft;
@@ -33,6 +34,7 @@ public abstract class MinecraftMixin {
     @Inject(method = "tick", at = @At("RETURN"))
     private void onTick(CallbackInfo ci) {
         KeySequence.reCheckPressedKeys();
+        InventoryActions.stackToNearbyContainersOnInterval();
     }
 
     @Inject(method = "clearDownloadedResourcePacks", at = @At("RETURN"))

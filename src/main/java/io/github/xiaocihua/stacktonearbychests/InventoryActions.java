@@ -31,6 +31,7 @@ import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toSet;
 
 public class InventoryActions {
+    private static long nextAutomaticStackToNearbyContainersMillis = -1;
 
     public static void init() {
         ClickSlotCallback.BEFORE.register((syncId, slotId, button, actionType, player) ->
@@ -45,11 +46,13 @@ public class InventoryActions {
     }
 
     public static void stackToNearbyContainers() {
-        forEachContainer(InventoryActions::quickStack, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
+        forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
     }
 
     public static void stackToNearbyContainers(Item item) {
-        forEachContainer(screenHandler -> quickStack(screenHandler, item), ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
+        forEachContainer(screenHandler -> quickStackToNearbyContainers(screenHandler, item),
+                ModOptions.get().behavior.stackingTargets,
+                ModOptions.get().behavior.stackingTargetEntities);
     }
 
     public static void restockFromNearbyContainers() {
@@ -81,6 +84,10 @@ public class InventoryActions {
             return;
         }
 
+        if (ForEachContainerTask.isRunning()) {
+            return;
+        }
+
         var task = new ForEachBlockContainerTask(client, cameraEntity, world, player, interactionManager, action, blockFilter);
 
         if (ModOptions.get().behavior.supportForContainerEntities.booleanValue() && !player.isPassenger()) {
@@ -91,6 +98,14 @@ public class InventoryActions {
     }
 
     public static void quickStack(AbstractContainerMenu screenHandler) {
+        quickStack(screenHandler, false);
+    }
+
+    public static void quickStackToNearbyContainers(AbstractContainerMenu screenHandler) {
+        quickStack(screenHandler, ModOptions.get().behavior.doNotSortRenamedItemsToNearbyContainers.booleanValue());
+    }
+
+    private static void quickStack(AbstractContainerMenu screenHandler, boolean skipRenamedItems) {
         var slots = SlotsInScreenHandler.of(screenHandler);
 
         Set<Item> itemsInContainer = slots.containerSlots().stream()
@@ -98,29 +113,58 @@ public class InventoryActions {
                 .filter(item -> !ModOptions.get().behavior.itemsThatWillNotBeStacked.contains(BuiltInRegistries.ITEM.getKey(item).toString()))
                 .collect(toSet());
 
-        moveAll(screenHandler, slots.playerSlots, itemsInContainer);
+        moveAll(screenHandler, slots.playerSlots, itemsInContainer, skipRenamedItems);
     }
 
     public static void quickStack(AbstractContainerMenu screenHandler, Item item) {
+        quickStack(screenHandler, item, false);
+    }
+
+    public static void quickStackToNearbyContainers(AbstractContainerMenu screenHandler, Item item) {
+        quickStack(screenHandler, item, ModOptions.get().behavior.doNotSortRenamedItemsToNearbyContainers.booleanValue());
+    }
+
+    private static void quickStack(AbstractContainerMenu screenHandler, Item item, boolean skipRenamedItems) {
         var slots = SlotsInScreenHandler.of(screenHandler);
 
         boolean hasSameTypeItems = slots.containerSlots.stream()
                 .anyMatch(slot -> slot.getItem().is(item));
 
         if (hasSameTypeItems) {
-            moveAll(screenHandler, slots.playerSlots(), Set.of(item));
+            moveAll(screenHandler, slots.playerSlots(), Set.of(item), skipRenamedItems);
         }
     }
 
-    private static void moveAll(AbstractContainerMenu screenHandler, List<Slot> playerSlots, Set<Item> itemsToBeMoved) {
+    private static void moveAll(AbstractContainerMenu screenHandler, List<Slot> playerSlots, Set<Item> itemsToBeMoved, boolean skipRenamedItems) {
         playerSlots.stream()
                 .filter(slot -> !(ModOptions.get().behavior.doNotQuickStackItemsFromTheHotbar.booleanValue()
                         && Inventory.isHotbarSlot(slot.getContainerSlot())))
                 .filter(not(InventoryActions::isSlotLocked))
                 .filter(slot -> itemsToBeMoved.contains(slot.getItem().getItem()))
+                .filter(slot -> !skipRenamedItems || !slot.getItem().hasCustomHoverName())
                 .filter(slot -> slot.mayPickup(Minecraft.getInstance().player))
                 .filter(Slot::hasItem)
                 .forEach(slot -> quickMove(screenHandler, slot));
+    }
+
+    public static void stackToNearbyContainersOnInterval() {
+        Minecraft client = Minecraft.getInstance();
+        int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
+        if (intervalSeconds <= 0 || client.level == null || client.player == null || client.screen != null) {
+            nextAutomaticStackToNearbyContainersMillis = -1;
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        if (nextAutomaticStackToNearbyContainersMillis == -1) {
+            nextAutomaticStackToNearbyContainersMillis = now + (long) intervalSeconds * 1000;
+            return;
+        }
+
+        if (now >= nextAutomaticStackToNearbyContainersMillis) {
+            nextAutomaticStackToNearbyContainersMillis = now + (long) intervalSeconds * 1000;
+            stackToNearbyContainers();
+        }
     }
 
     public static void restock(AbstractContainerMenu screenHandler) {
