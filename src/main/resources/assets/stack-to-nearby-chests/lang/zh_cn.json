@@ -71,4 +71,6 @@
   "stack-to-nearby-chests.options.keyMapHint": "使用退格键清空按键绑定。",
   "stack-to-nearby-chests.options.done": "完成",
   "stack-to-nearby-chests.options.searchInterval.tooltip": "对上一个容器的操作结束到开启下一个容器之间的时间（单位：毫秒）"
+  ,"stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds": "快速堆叠到附近容器的间隔（秒）"
+  ,"stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds.tooltip": "每隔 X 秒自动执行一次“快速堆叠到附近的容器”（0 = 禁用）"
 }

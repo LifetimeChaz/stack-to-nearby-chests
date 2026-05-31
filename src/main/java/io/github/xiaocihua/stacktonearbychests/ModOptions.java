@@ -104,6 +104,7 @@ public class ModOptions {
 
     public static class Behavior {
         public IntOption searchInterval = new IntOption(0);
+        public IntOption stackToNearbyContainersIntervalSeconds = new IntOption(0);
 
         public MutableBoolean supportForContainerEntities = new MutableBoolean(true);
 
