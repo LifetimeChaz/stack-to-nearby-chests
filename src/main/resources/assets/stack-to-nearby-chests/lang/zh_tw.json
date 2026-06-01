@@ -71,6 +71,8 @@
   "stack-to-nearby-chests.options.keyMapHint": "使用 Backspace 鍵清空按鍵綁定。",
   "stack-to-nearby-chests.options.done": "完成",
   "stack-to-nearby-chests.options.searchInterval.tooltip": "對上一個容器的操作結束到開啟下一個容器之間的時間（單位：毫秒）",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval": "啟用自動堆疊間隔",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval.tooltip": "啟用後，按下快速堆疊熱鍵將切換自動堆疊的開/關狀態。停用時，熱鍵僅執行一次堆疊操作",
   "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds": "快速堆疊到附近容器的間隔（秒）",
   "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds.tooltip": "每隔 X 秒自動執行一次「快速堆疊到附近的容器」（0 = 停用）",
   "stack-to-nearby-chests.options.doNotSortRenamedItemsToNearbyContainers": "不要將已重新命名物品快速堆疊到附近容器"

@@ -38,6 +38,8 @@
   "stack-to-nearby-chests.options.behavior": "Поведение",
   "stack-to-nearby-chests.options.searchInterval": "Длительность поиска",
   "stack-to-nearby-chests.options.searchInterval.tooltip": "Время между концом всех действий над одним хранилищем и началом действий над другим (измеряется в миллисекундах)",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval": "Включить интервал автоматической выкладки",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval.tooltip": "Когда включено, нажатие горячей клавиши быстрой выкладки будет переключать автоматическую выкладку вкл/выкл. Когда отключено, горячая клавиша выполняет только одну операцию выкладки",
   "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds": "Интервал выкладывания в ближайшие хранилища (секунды)",
   "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds.tooltip": "Автоматически выполнять «Выложить в ближайшие хранилища» каждые X секунд (0 = отключено)",
   "stack-to-nearby-chests.options.supportForContainerEntities": "Поддерживать хранилища-сущности",

@@ -71,7 +71,9 @@
   "stack-to-nearby-chests.options.keyMapHint": "使用退格键清空按键绑定。",
   "stack-to-nearby-chests.options.done": "完成",
   "stack-to-nearby-chests.options.searchInterval.tooltip": "对上一个容器的操作结束到开启下一个容器之间的时间（单位：毫秒）",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval": "启用自动堆叠间隔",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval.tooltip": "启用后，按下快速堆叠热键将切换自动堆叠的开/关状态。禁用时，热键仅执行一次堆叠操作",
   "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds": "快速堆叠到附近容器的间隔（秒）",
-  "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds.tooltip": "每隔 X 秒自动执行一次“快速堆叠到附近的容器”（0 = 禁用）",
+  "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds.tooltip": "每隔 X 秒自动执行一次"快速堆叠到附近的容器"（0 = 禁用）",
   "stack-to-nearby-chests.options.doNotSortRenamedItemsToNearbyContainers": "不要将已重命名物品快速堆叠到附近容器"
 }
