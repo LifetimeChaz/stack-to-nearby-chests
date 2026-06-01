@@ -69,7 +69,7 @@ public class StackToNearbyChests implements ClientModInitializer {
                 if (seconds >= 0 && seconds != lastDisplayedCountdownSecond[0]) {
                     lastDisplayedCountdownSecond[0] = seconds;
                     Component hud = Component.translatable("stack-to-nearby-chests.hud.intervalCountdown", seconds);
-                    client.player.displayClientMessage(hud, true);
+                    client.gui.setOverlayMessage(hud, false);
                 } else if (seconds < 0) {
                     lastDisplayedCountdownSecond[0] = -1;
                 }
