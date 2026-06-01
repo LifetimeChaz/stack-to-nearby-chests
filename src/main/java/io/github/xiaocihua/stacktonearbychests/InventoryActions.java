@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -141,7 +142,7 @@ public class InventoryActions {
                         && Inventory.isHotbarSlot(slot.getContainerSlot())))
                 .filter(not(InventoryActions::isSlotLocked))
                 .filter(slot -> itemsToBeMoved.contains(slot.getItem().getItem()))
-                .filter(slot -> !skipRenamedItems || !slot.getItem().hasCustomHoverName())
+                .filter(slot -> !skipRenamedItems || !slot.getItem().has(DataComponents.CUSTOM_NAME))
                 .filter(slot -> slot.mayPickup(Minecraft.getInstance().player))
                 .filter(Slot::hasItem)
                 .forEach(slot -> quickMove(screenHandler, slot));
