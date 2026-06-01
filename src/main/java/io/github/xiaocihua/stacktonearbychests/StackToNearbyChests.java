@@ -64,15 +64,15 @@ public class StackToNearbyChests implements ClientModInitializer {
 
         final long[] lastDisplayedCountdownSecond = {-1};
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (InventoryActions.isIntervalLoopActive() && client.player != null) {
+            if (client.player != null) {
                 long seconds = InventoryActions.getSecondsUntilNextStack();
                 if (seconds >= 0 && seconds != lastDisplayedCountdownSecond[0]) {
                     lastDisplayedCountdownSecond[0] = seconds;
                     Component hud = Component.translatable("stack-to-nearby-chests.hud.intervalCountdown", seconds);
-                    client.gui.setOverlayMessage(hud, false);
+                    client.player.displayClientMessage(hud, true);
+                } else if (seconds < 0) {
+                    lastDisplayedCountdownSecond[0] = -1;
                 }
-            } else {
-                lastDisplayedCountdownSecond[0] = -1;
             }
         });
 
@@ -163,7 +163,7 @@ public class StackToNearbyChests implements ClientModInitializer {
                         AbstractContainerMenu screenHandler = screen.getMenu();
                         ItemStack cursorStack = screenHandler.getCarried();
                         if (cursorStack.isEmpty()) {
-                            InventoryActions.toggleIntervalLoop();
+                            InventoryActions.stackToNearbyContainers();
                         } else {
                             Item item = cursorStack.getItem();
 
