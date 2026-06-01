@@ -46,10 +46,23 @@ public class InventoryActions {
             }
             return InteractionResult.PASS;
         });
-        DisconnectCallback.EVENT.register(() -> {
-            nextAutomaticStackToNearbyContainersMillis = -1;
-            intervalModeEnabled = false;
-        });
+        DisconnectCallback.EVENT.register(() -> disableIntervalMode());
+    }
+
+    /**
+     * Disables the interval mode and resets the timer.
+     */
+    private static void disableIntervalMode() {
+        intervalModeEnabled = false;
+        nextAutomaticStackToNearbyContainersMillis = -1;
+    }
+
+    /**
+     * Enables the interval mode and sets the timer to the configured interval.
+     */
+    private static void enableIntervalMode(int intervalSeconds) {
+        intervalModeEnabled = true;
+        nextAutomaticStackToNearbyContainersMillis = System.currentTimeMillis() + (long) intervalSeconds * 1000;
     }
 
     /**
@@ -72,14 +85,12 @@ public class InventoryActions {
         // Toggle interval mode
         if (intervalModeEnabled) {
             // Turn off interval mode
-            intervalModeEnabled = false;
-            nextAutomaticStackToNearbyContainersMillis = -1;
+            disableIntervalMode();
         } else {
             // Start interval mode if interval is configured
             int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
             if (intervalSeconds > 0) {
-                intervalModeEnabled = true;
-                nextAutomaticStackToNearbyContainersMillis = System.currentTimeMillis() + (long) intervalSeconds * 1000;
+                enableIntervalMode(intervalSeconds);
             }
         }
     }
@@ -187,14 +198,13 @@ public class InventoryActions {
         
         // Only proceed if interval mode is enabled
         if (!intervalModeEnabled) {
-            nextAutomaticStackToNearbyContainersMillis = -1;
+            disableIntervalMode();
             return;
         }
         
         int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
         if (intervalSeconds <= 0 || client.level == null || client.player == null) {
-            intervalModeEnabled = false;
-            nextAutomaticStackToNearbyContainersMillis = -1;
+            disableIntervalMode();
             return;
         }
 
