@@ -73,5 +73,6 @@
   "stack-to-nearby-chests.options.openModOptionsScreen": "Open mod options screen",
   "stack-to-nearby-chests.options.reset": "Reset",
   "stack-to-nearby-chests.options.keyMapHint": "Use backspace key to clear a key binding.",
-  "stack-to-nearby-chests.options.done": "Done"
+  "stack-to-nearby-chests.options.done": "Done",
+  "stack-to-nearby-chests.hud.intervalCountdown": "⟳ Auto-stacking active | Next: %ss"
 }
