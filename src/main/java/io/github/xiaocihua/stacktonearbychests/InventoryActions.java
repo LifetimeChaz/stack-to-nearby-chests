@@ -66,13 +66,15 @@ public class InventoryActions {
     }
 
     public static void stackToNearbyContainers() {
-        // Toggle interval mode if called manually
+        // Always run the stack operation
+        forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
+        
+        // Toggle interval mode
         if (intervalModeEnabled) {
             // Turn off interval mode
             intervalModeEnabled = false;
             nextAutomaticStackToNearbyContainersMillis = -1;
         } else {
-            forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
             // Start interval mode if interval is configured
             int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
             if (intervalSeconds > 0) {
