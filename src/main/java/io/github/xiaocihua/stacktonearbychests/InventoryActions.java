@@ -34,6 +34,7 @@ import static java.util.stream.Collectors.toSet;
 
 public class InventoryActions {
     private static long nextAutomaticStackToNearbyContainersMillis = -1;
+    private static boolean intervalModeEnabled = false;
 
     public static void init() {
         ClickSlotCallback.BEFORE.register((syncId, slotId, button, actionType, player) ->
@@ -45,7 +46,10 @@ public class InventoryActions {
             }
             return InteractionResult.PASS;
         });
-        DisconnectCallback.EVENT.register(() -> nextAutomaticStackToNearbyContainersMillis = -1);
+        DisconnectCallback.EVENT.register(() -> {
+            nextAutomaticStackToNearbyContainersMillis = -1;
+            intervalModeEnabled = false;
+        });
     }
 
     /**
@@ -62,7 +66,20 @@ public class InventoryActions {
     }
 
     public static void stackToNearbyContainers() {
-        forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
+        // Toggle interval mode if called manually
+        if (intervalModeEnabled) {
+            // Turn off interval mode
+            intervalModeEnabled = false;
+            nextAutomaticStackToNearbyContainersMillis = -1;
+        } else {
+            forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
+            // Start interval mode if interval is configured
+            int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
+            if (intervalSeconds > 0) {
+                intervalModeEnabled = true;
+                nextAutomaticStackToNearbyContainersMillis = System.currentTimeMillis() + (long) intervalSeconds * 1000;
+            }
+        }
     }
 
     public static void stackToNearbyContainers(Item item) {
@@ -165,8 +182,16 @@ public class InventoryActions {
 
     public static void stackToNearbyContainersOnInterval() {
         Minecraft client = Minecraft.getInstance();
+        
+        // Only proceed if interval mode is enabled
+        if (!intervalModeEnabled) {
+            nextAutomaticStackToNearbyContainersMillis = -1;
+            return;
+        }
+        
         int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
-        if (intervalSeconds <= 0 || client.level == null || client.player == null || client.screen != null) {
+        if (intervalSeconds <= 0 || client.level == null || client.player == null) {
+            intervalModeEnabled = false;
             nextAutomaticStackToNearbyContainersMillis = -1;
             return;
         }
@@ -178,8 +203,13 @@ public class InventoryActions {
         }
 
         if (now >= nextAutomaticStackToNearbyContainersMillis) {
+            // Close any open screens before running the stack operation
+            if (client.screen != null) {
+                client.setScreen(null);
+            }
+            
             nextAutomaticStackToNearbyContainersMillis = now + (long) intervalSeconds * 1000;
-            stackToNearbyContainers();
+            forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
         }
     }
 
