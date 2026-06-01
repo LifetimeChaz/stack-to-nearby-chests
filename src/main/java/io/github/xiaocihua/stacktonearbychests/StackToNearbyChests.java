@@ -10,6 +10,7 @@ import io.github.xiaocihua.stacktonearbychests.mixin.RecipeBookComponentAccessor
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.fabric.impl.client.screen.ScreenExtensions;
@@ -60,6 +61,16 @@ public class StackToNearbyChests implements ClientModInitializer {
         ForEachContainerTask.init();
 
         ScreenEvents.AFTER_INIT.register(this::addButtonsAndKeys);
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (InventoryActions.isIntervalLoopActive() && client.player != null) {
+                long seconds = InventoryActions.getSecondsUntilNextStack();
+                if (seconds >= 0) {
+                    Component hud = Component.translatable("stack-to-nearby-chests.hud.intervalCountdown", seconds);
+                    client.gui.setOverlayMessage(hud, false);
+                }
+            }
+        });
 
         ModOptions.get().keymap.stackToNearbyContainersKey.registerNotOnScreen(InventoryActions::stackToNearbyContainers, InteractionResult.PASS);
         ModOptions.get().keymap.restockFromNearbyContainersKey.registerNotOnScreen(InventoryActions::restockFromNearbyContainers, InteractionResult.PASS);
@@ -148,7 +159,7 @@ public class StackToNearbyChests implements ClientModInitializer {
                         AbstractContainerMenu screenHandler = screen.getMenu();
                         ItemStack cursorStack = screenHandler.getCarried();
                         if (cursorStack.isEmpty()) {
-                            InventoryActions.stackToNearbyContainers();
+                            InventoryActions.toggleIntervalLoop();
                         } else {
                             Item item = cursorStack.getItem();
 

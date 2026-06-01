@@ -1,6 +1,7 @@
 package io.github.xiaocihua.stacktonearbychests;
 
 import io.github.xiaocihua.stacktonearbychests.event.ClickSlotCallback;
+import io.github.xiaocihua.stacktonearbychests.event.DisconnectCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -32,6 +33,7 @@ import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toSet;
 
 public class InventoryActions {
+    private static boolean intervalLoopActive = false;
     private static long nextAutomaticStackToNearbyContainersMillis = -1;
 
     public static void init() {
@@ -44,6 +46,48 @@ public class InventoryActions {
             }
             return InteractionResult.PASS;
         });
+        DisconnectCallback.EVENT.register(() -> {
+            intervalLoopActive = false;
+            nextAutomaticStackToNearbyContainersMillis = -1;
+        });
+    }
+
+    /**
+     * Toggles the repeating stack-to-nearby-containers loop on or off.
+     * If the loop is currently active, stops it and does one final stack.
+     * If the loop is not active, does an initial stack and starts the loop
+     * if {@code stackToNearbyContainersIntervalSeconds} is greater than 0.
+     */
+    public static void toggleIntervalLoop() {
+        if (intervalLoopActive) {
+            intervalLoopActive = false;
+            nextAutomaticStackToNearbyContainersMillis = -1;
+            stackToNearbyContainers();
+        } else {
+            stackToNearbyContainers();
+            int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
+            if (intervalSeconds > 0) {
+                intervalLoopActive = true;
+                nextAutomaticStackToNearbyContainersMillis = System.currentTimeMillis() + (long) intervalSeconds * 1000;
+            }
+        }
+    }
+
+    /** Returns true when the repeating stack loop is currently counting down. */
+    public static boolean isIntervalLoopActive() {
+        return intervalLoopActive;
+    }
+
+    /**
+     * Returns the number of seconds (rounded up) until the next automatic stack,
+     * or -1 if the loop is not active.
+     */
+    public static long getSecondsUntilNextStack() {
+        if (!intervalLoopActive || nextAutomaticStackToNearbyContainersMillis == -1) {
+            return -1;
+        }
+        long remaining = nextAutomaticStackToNearbyContainersMillis - System.currentTimeMillis();
+        return Math.max(0, (remaining + 999) / 1000);
     }
 
     public static void stackToNearbyContainers() {
@@ -149,20 +193,24 @@ public class InventoryActions {
     }
 
     public static void stackToNearbyContainersOnInterval() {
+        if (!intervalLoopActive) {
+            return;
+        }
         Minecraft client = Minecraft.getInstance();
-        int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
-        if (intervalSeconds <= 0 || client.level == null || client.player == null || client.screen != null) {
+        if (client.level == null || client.player == null) {
+            intervalLoopActive = false;
             nextAutomaticStackToNearbyContainersMillis = -1;
             return;
         }
 
         long now = System.currentTimeMillis();
-        if (nextAutomaticStackToNearbyContainersMillis == -1) {
-            nextAutomaticStackToNearbyContainersMillis = now + (long) intervalSeconds * 1000;
-            return;
-        }
-
         if (now >= nextAutomaticStackToNearbyContainersMillis) {
+            int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
+            if (intervalSeconds <= 0) {
+                intervalLoopActive = false;
+                nextAutomaticStackToNearbyContainersMillis = -1;
+                return;
+            }
             nextAutomaticStackToNearbyContainersMillis = now + (long) intervalSeconds * 1000;
             stackToNearbyContainers();
         }

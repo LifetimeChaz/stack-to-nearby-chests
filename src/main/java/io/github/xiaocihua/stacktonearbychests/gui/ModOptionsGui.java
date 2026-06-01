@@ -142,7 +142,7 @@ public class ModOptionsGui extends LightweightGuiDescription {
         TextFieldWithLabel stackToNearbyContainersIntervalSeconds = createIntTextField("stackToNearbyContainersIntervalSeconds", options.behavior.stackToNearbyContainersIntervalSeconds)
                 .withTooltip(PREFIX + "stackToNearbyContainersIntervalSeconds.tooltip");
         stackToNearbyContainersIntervalSeconds.getTextField().setTextPredicate(text -> NumberUtils.toInt(text, -1) >= 0);
-        behavior.add(stackToNearbyContainersIntervalSeconds, 230, 20);
+        behavior.add(stackToNearbyContainersIntervalSeconds, 370, 20);
 
         behavior.add(createCheckbox("supportForContainerEntities", options.behavior.supportForContainerEntities));
         behavior.add(createCheckbox("doNotSortRenamedItemsToNearbyContainers", options.behavior.doNotSortRenamedItemsToNearbyContainers));
