@@ -34,6 +34,7 @@ import static java.util.stream.Collectors.toSet;
 
 public class InventoryActions {
     private static long nextAutomaticStackToNearbyContainersMillis = -1;
+    private static boolean intervalModeEnabled = false;
 
     public static void init() {
         ClickSlotCallback.BEFORE.register((syncId, slotId, button, actionType, player) ->
@@ -45,7 +46,23 @@ public class InventoryActions {
             }
             return InteractionResult.PASS;
         });
-        DisconnectCallback.EVENT.register(() -> nextAutomaticStackToNearbyContainersMillis = -1);
+        DisconnectCallback.EVENT.register(() -> disableIntervalMode());
+    }
+
+    /**
+     * Disables the interval mode and resets the timer.
+     */
+    private static void disableIntervalMode() {
+        intervalModeEnabled = false;
+        nextAutomaticStackToNearbyContainersMillis = -1;
+    }
+
+    /**
+     * Enables the interval mode and sets the timer to the configured interval.
+     */
+    private static void enableIntervalMode(int intervalSeconds) {
+        intervalModeEnabled = true;
+        nextAutomaticStackToNearbyContainersMillis = System.currentTimeMillis() + (long) intervalSeconds * 1000;
     }
 
     /**
@@ -62,7 +79,20 @@ public class InventoryActions {
     }
 
     public static void stackToNearbyContainers() {
+        // Always run the stack operation
         forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
+        
+        // Toggle interval mode
+        if (intervalModeEnabled) {
+            // Turn off interval mode
+            disableIntervalMode();
+        } else {
+            // Start interval mode if interval is configured
+            int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
+            if (intervalSeconds > 0) {
+                enableIntervalMode(intervalSeconds);
+            }
+        }
     }
 
     public static void stackToNearbyContainers(Item item) {
@@ -165,9 +195,16 @@ public class InventoryActions {
 
     public static void stackToNearbyContainersOnInterval() {
         Minecraft client = Minecraft.getInstance();
+        
+        // Only proceed if interval mode is enabled
+        if (!intervalModeEnabled) {
+            disableIntervalMode();
+            return;
+        }
+        
         int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
-        if (intervalSeconds <= 0 || client.level == null || client.player == null || client.screen != null) {
-            nextAutomaticStackToNearbyContainersMillis = -1;
+        if (intervalSeconds <= 0 || client.level == null || client.player == null) {
+            disableIntervalMode();
             return;
         }
 
@@ -178,8 +215,13 @@ public class InventoryActions {
         }
 
         if (now >= nextAutomaticStackToNearbyContainersMillis) {
+            // Close any open screens before running the stack operation
+            if (client.screen != null) {
+                client.setScreen(null);
+            }
+            
             nextAutomaticStackToNearbyContainersMillis = now + (long) intervalSeconds * 1000;
-            stackToNearbyContainers();
+            forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
         }
     }
 
