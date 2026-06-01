@@ -8,6 +8,7 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,6 +50,7 @@ public class InventoryActions {
         DisconnectCallback.EVENT.register(() -> {
             intervalLoopActive = false;
             nextAutomaticStackToNearbyContainersMillis = -1;
+            clearOverlayMessage();
         });
     }
 
@@ -62,6 +64,7 @@ public class InventoryActions {
         if (intervalLoopActive) {
             intervalLoopActive = false;
             nextAutomaticStackToNearbyContainersMillis = -1;
+            clearOverlayMessage();
             stackToNearbyContainers();
         } else {
             stackToNearbyContainers();
@@ -70,6 +73,14 @@ public class InventoryActions {
                 intervalLoopActive = true;
                 nextAutomaticStackToNearbyContainersMillis = System.currentTimeMillis() + (long) intervalSeconds * 1000;
             }
+        }
+    }
+
+    /** Clears the action-bar overlay message from the HUD. */
+    private static void clearOverlayMessage() {
+        Minecraft client = Minecraft.getInstance();
+        if (client.gui != null) {
+            client.gui.setOverlayMessage(Component.empty(), false);
         }
     }
 
@@ -87,6 +98,7 @@ public class InventoryActions {
             return -1;
         }
         long remaining = nextAutomaticStackToNearbyContainersMillis - System.currentTimeMillis();
+        // Ceiling division: rounds up to the nearest second so the display shows "1s" until the instant it fires
         return Math.max(0, (remaining + 999) / 1000);
     }
 
@@ -200,6 +212,7 @@ public class InventoryActions {
         if (client.level == null || client.player == null) {
             intervalLoopActive = false;
             nextAutomaticStackToNearbyContainersMillis = -1;
+            clearOverlayMessage();
             return;
         }
 
@@ -209,6 +222,7 @@ public class InventoryActions {
             if (intervalSeconds <= 0) {
                 intervalLoopActive = false;
                 nextAutomaticStackToNearbyContainersMillis = -1;
+                clearOverlayMessage();
                 return;
             }
             nextAutomaticStackToNearbyContainersMillis = now + (long) intervalSeconds * 1000;

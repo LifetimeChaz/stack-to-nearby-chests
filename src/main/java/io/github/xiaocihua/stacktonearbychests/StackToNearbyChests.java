@@ -62,13 +62,17 @@ public class StackToNearbyChests implements ClientModInitializer {
 
         ScreenEvents.AFTER_INIT.register(this::addButtonsAndKeys);
 
+        final long[] lastDisplayedCountdownSecond = {-1};
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (InventoryActions.isIntervalLoopActive() && client.player != null) {
                 long seconds = InventoryActions.getSecondsUntilNextStack();
-                if (seconds >= 0) {
+                if (seconds >= 0 && seconds != lastDisplayedCountdownSecond[0]) {
+                    lastDisplayedCountdownSecond[0] = seconds;
                     Component hud = Component.translatable("stack-to-nearby-chests.hud.intervalCountdown", seconds);
                     client.gui.setOverlayMessage(hud, false);
                 }
+            } else {
+                lastDisplayedCountdownSecond[0] = -1;
             }
         });
 
