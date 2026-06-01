@@ -39,6 +39,8 @@
   "stack-to-nearby-chests.options.behavior": "Behavior",
   "stack-to-nearby-chests.options.searchInterval": "Search interval",
   "stack-to-nearby-chests.options.searchInterval.tooltip": "The time between the end of the operations on the previous container and the opening of the next container (unit: milliseconds)",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval": "Enable auto-stacking interval",
+  "stack-to-nearby-chests.options.enableStackToNearbyContainersInterval.tooltip": "When enabled, pressing the quick stack hotkey will toggle automatic stacking on/off. When disabled, the hotkey only performs a single stack operation",
   "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds": "Quick stack to nearby containers interval (seconds)",
   "stack-to-nearby-chests.options.stackToNearbyContainersIntervalSeconds.tooltip": "Automatically run quick stack to nearby containers every X seconds (0 = disabled)",
   "stack-to-nearby-chests.options.supportForContainerEntities": "Support for container entities",

@@ -82,15 +82,17 @@ public class InventoryActions {
         // Always run the stack operation
         forEachContainer(InventoryActions::quickStackToNearbyContainers, ModOptions.get().behavior.stackingTargets, ModOptions.get().behavior.stackingTargetEntities);
         
-        // Toggle interval mode
-        if (intervalModeEnabled) {
-            // Turn off interval mode
-            disableIntervalMode();
-        } else {
-            // Start interval mode if interval is configured
-            int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
-            if (intervalSeconds > 0) {
-                enableIntervalMode(intervalSeconds);
+        // Toggle interval mode only if the interval feature is enabled in settings
+        if (ModOptions.get().behavior.enableStackToNearbyContainersInterval.booleanValue()) {
+            if (intervalModeEnabled) {
+                // Turn off interval mode
+                disableIntervalMode();
+            } else {
+                // Start interval mode if interval is configured
+                int intervalSeconds = ModOptions.get().behavior.stackToNearbyContainersIntervalSeconds.intValue();
+                if (intervalSeconds > 0) {
+                    enableIntervalMode(intervalSeconds);
+                }
             }
         }
     }
@@ -196,8 +198,8 @@ public class InventoryActions {
     public static void stackToNearbyContainersOnInterval() {
         Minecraft client = Minecraft.getInstance();
         
-        // Only proceed if interval mode is enabled
-        if (!intervalModeEnabled) {
+        // Only proceed if the interval feature is enabled in settings and interval mode is active
+        if (!ModOptions.get().behavior.enableStackToNearbyContainersInterval.booleanValue() || !intervalModeEnabled) {
             disableIntervalMode();
             return;
         }
