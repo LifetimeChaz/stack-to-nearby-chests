@@ -139,8 +139,8 @@ public class ModOptionsGui extends LightweightGuiDescription {
         searchInterval.getTextField().setTextPredicate(text -> NumberUtils.toInt(text, -1) >= 0);
         behavior.add(searchInterval, 230, 20);
 
-        behavior.add(createCheckbox("enableStackToNearbyContainersInterval", options.behavior.enableStackToNearbyContainersInterval)
-                .withTooltip(PREFIX + "enableStackToNearbyContainersInterval.tooltip"));
+        behavior.add(createCheckbox("enableStackToNearbyContainersInterval", options.behavior.enableStackToNearbyContainersInterval,
+                Minecraft.getInstance().font.split(Component.translatable(PREFIX + "enableStackToNearbyContainersInterval.tooltip"), 150)));
 
         TextFieldWithLabel stackToNearbyContainersIntervalSeconds = createIntTextField("stackToNearbyContainersIntervalSeconds", options.behavior.stackToNearbyContainersIntervalSeconds)
                 .withTooltip(PREFIX + "stackToNearbyContainersIntervalSeconds.tooltip");
